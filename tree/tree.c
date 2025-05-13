@@ -10,16 +10,52 @@ Tree root = {.n={
         .path = "/"
 }};
 
+void print_tree(int fd, Tree *_root){
+        int8 indentation;
+        int8 buf[256];
+        int16 size;
+        Node *n;
+        Leaf *l;
 
-/*
-struct s_node {
-Tag tag;
-struct s_node *north;
-struct s_node *west;
-struct s_leaf *east;
-int8 path[256];
-};
-*/
+        indentation = 0;
+
+        for(n=(Node *)_root; n; n=n->west){
+                Print(indent(indentation++));
+                Print(n->path);
+                Print("\n");
+                if(n->east)
+                        for(l=n->east; l; l=l->east){
+                                Print(indent(indentation));
+                                Print(n->path);
+                                Print("/");
+                                Print(l->key);
+                                Print(" -> ");
+                                write(fd, (char *)l->value, (int)l->size);
+                                Print("'\n'");
+                        }
+
+        }
+
+        return;
+}
+
+int8 *indent(int16 n) {
+        int16 i;
+        static int8 buf[256]; //can be accesed from outside, but zeroed out in this function
+        int8 *p;
+
+        if(n<1)
+                return (int8 *)"";
+
+        assert(n<120);
+        zero(buf, 256);
+
+        for(i=0, p=buf; i<n; i++, p+=2)
+                strncpy((char *)p, "  ", 2);
+
+        return buf;
+
+}
 
 void zero(int8 *str, int16 size){
         int8 *p;
@@ -107,7 +143,7 @@ int main() {
 
         n = create_node((Node *)&root, (int8 *)"/Users");
         assert(n);
-        n2 = create_node((Node *)&n, (int8 *)"/Users/login");
+        n2 = create_node(n, (int8 *)"/Users/login");
         assert(n2);
 
         key = (int8 *)"Anantya";
@@ -117,7 +153,7 @@ int main() {
         l1 = create_leaf(n2,key, value, size);
         assert(l1);
 
-        printf("%s\n",l1->value);
+        //printf("%s\n",l1->value);
 
         key = (int8 *)"Rachana";
         value = (int8 *)"bb6748dbnsn";
@@ -126,7 +162,9 @@ int main() {
         l2 = create_leaf(n2, key, value, size);
         assert(l2);
 
-        printf("%s\n", l2->value);
+        //printf("%s\n", l2->value);
+
+        print_tree(1,&root);
 
         free(l2);
         free(l1);
