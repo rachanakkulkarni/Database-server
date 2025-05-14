@@ -24,7 +24,9 @@ void print_tree(int fd, Tree *_root){
                 Print(n->path);
                 Print("\n");
                 if(n->east)
-                        for(l=n->east; l; l=l->east){
+                        for(l=n->east;
+                        l;
+                        l=l->east){
                                 Print(indent(indentation));
                                 Print(n->path);
                                 Print("/");
@@ -85,6 +87,22 @@ Node *create_node(Node *parent, int8 *path) {
 
 }
 
+Node *find_node_linear(int8 *path){
+        Node *p,*ret;
+
+        for(ret=(Node *)0, p=(Node *)&root; p; p=p->west) {
+                if(!strcmp((char *)p->path,(char *)path)) {
+                        ret = p;
+                        break;
+                }
+        }
+                return ret;
+}
+
+Leaf *lookup_linear(int8 *path, int8 *key){
+        return (Leaf *)0;
+}
+
 Leaf *find_last_linear(Node *parent) {
         Leaf *l;
 
@@ -140,6 +158,7 @@ int main() {
         Leaf *l1, *l2;
         int8 *key, *value;
         int16 size;
+        //Node *test;
 
         n = create_node((Node *)&root, (int8 *)"/Users");
         assert(n);
@@ -165,6 +184,7 @@ int main() {
         //printf("%s\n", l2->value);
 
         print_tree(1,&root);
+        printf("%p\n", find_node_linear((int8 *)"/Users/login"));
 
         free(l2);
         free(l1);
