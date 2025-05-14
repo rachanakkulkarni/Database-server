@@ -99,8 +99,30 @@ Node *find_node_linear(int8 *path){
                 return ret;
 }
 
-Leaf *lookup_linear(int8 *path, int8 *key){
-        return (Leaf *)0;
+Leaf *find_leaf_linear(int8 *path, int8 *key){
+        Node *n;
+        Leaf *l, *ret;
+
+        n = find_node_linear(path);
+        if(!n)
+                return (Leaf *)0;
+
+        for(ret=(Leaf *)0, l=n->east; l; l=l->east)
+                if(!strcmp((char *)l->key, (char *)key)){
+                        ret = l;
+                        break;
+                }
+        return ret;
+}
+
+int8 *lookup_linear(int8 *path, int8 *key){
+        Leaf *p;
+
+        p = find_leaf_linear(path, key);
+
+        return (p) ?
+                p->value:
+                (int8 *)0;
 }
 
 Leaf *find_last_linear(Node *parent) {
@@ -158,7 +180,7 @@ int main() {
         Leaf *l1, *l2;
         int8 *key, *value;
         int16 size;
-        //Node *test;
+        int8 *test;
 
         n = create_node((Node *)&root, (int8 *)"/Users");
         assert(n);
@@ -184,7 +206,13 @@ int main() {
         //printf("%s\n", l2->value);
 
         print_tree(1,&root);
-        printf("%p\n", find_node_linear((int8 *)"/Users/login"));
+        test = lookup((int8 *)"/Users/login",
+                        (int8 *)"Anantya");
+
+        if(test)
+                printf("%s\n",test);
+        else
+                printf("No\n");
 
         free(l2);
         free(l1);
