@@ -175,49 +175,61 @@ Leaf *create_leaf(Node *parent, int8 *key, int8 *value, int16 count){
         return new;
 
 }
+
+Tree *example_tree() {
+        int8 c;
+        Node *n,*p;
+        int8 path[256];
+        int32 x;
+
+        zero(path, 256);
+        x = 0;
+
+        for(n =(Node *)&root, c='a';c<='z';c++){
+                x = (int32)strlen((char *)path);
+                *(path + x++) = '/';
+                *(path + x) = c;
+
+                p = n;
+                n =  create_node(p, path);
+        }
+
+        return (Tree *)&root;
+
+        }
+
+int8 *example_path(int8 path) {
+        int32 x;
+        static int8 buf[256];
+        int8 c;
+        zero(buf, 256);
+
+        for(c = 'a'; c<=path; c++) {
+                x = (int32)strlen((char *)buf);
+                *(buf + x++) = '/';
+                *(buf + x) = c;
+        }
+
+        return buf;
+}
+
+int32 *example_leaves (){
+        int fd;
+        int8 c;
+        int8 buf[256];
+        Leaf *l;
+        Node *n;
+
+}
+
 int main() {
-        Node *n, *n2;
-        Leaf *l1, *l2;
-        int8 *key, *value;
-        int16 size;
-        int8 *test;
+        Tree *example;
 
-        n = create_node((Node *)&root, (int8 *)"/Users");
-        assert(n);
-        n2 = create_node(n, (int8 *)"/Users/login");
-        assert(n2);
+        printf("%s\n", example_path('j'));
+        return 0;
 
-        key = (int8 *)"Anantya";
-        value = (int8 *)"abc77711aa";
-        size  =(int16)strlen((char *)value);
-
-        l1 = create_leaf(n2,key, value, size);
-        assert(l1);
-
-        //printf("%s\n",l1->value);
-
-        key = (int8 *)"Rachana";
-        value = (int8 *)"bb6748dbnsn";
-        size =(int16)strlen((char *)value);
-
-        l2 = create_leaf(n2, key, value, size);
-        assert(l2);
-
-        //printf("%s\n", l2->value);
-
-        print_tree(1,&root);
-        test = lookup((int8 *)"/Users/login",
-                        (int8 *)"Anantya");
-
-        if(test)
-                printf("%s\n",test);
-        else
-                printf("No\n");
-
-        free(l2);
-        free(l1);
-        free(n2);
-        free(n);
+        example = example_tree();
+        print_tree(1,example);
 
         return 0;
 }
