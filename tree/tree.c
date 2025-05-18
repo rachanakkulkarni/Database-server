@@ -302,9 +302,53 @@ int32 *example_leaves() {
         return &y; // Fix return type to match int32*
 }
 
-int main() {
+int32 *example_searches(int8 *file) {
+        FILE *fd;
+        int8 buf[64];
+        int8 *path, *value;
+        int16 size;
+        int32 n;
+
+        fd = fopen((int8 *)file, "r");
+        assert(fd);
+
+        n = 0;
+
+        zero(buf, 64);
+        while(fgets((char *)buf, 63, fd)){
+                size = (int16)strlen((char *)buf);
+                assert(size);
+                size--;
+                buf[size] = 0;
+
+                path  = example_path(*buf);
+                value = lookup(path, buf);
+                if(value) {
+                        printf("%s -> '%s' \n", buf, value);
+                        fflush(stdout);
+                        n++;
+                }
+                zero(buf, 64);
+        }
+        fclose(fd);
+
+        return n;
+}
+
+int main(int argc, char *argv[]) {
         Tree *example;
-        int32 x;
+        int32 x,y;
+        int8 *p;
+        struct rusage usage;
+        float duration;
+        int8 *file;
+
+        if(argc < 2){
+                fprintf(stderr, "Usage: %s INFILE\n", *argv);
+                return -1;
+        }
+        else
+                file = (int8 *)argv[1];
 
         example = example_tree();
         printf("Populating the tree... ");
@@ -312,7 +356,28 @@ int main() {
         x = example_leaves();
         printf("done (%d)\n\n",x);
 
-        print_tree(1,example);
+        if(fork())
+                wait(0);
+        else {
+                example_searches(file);
+                exit(0);
+        }
+
+        //print_tree(1,example);
+
+        y = getrusage(RUSAGE_CHILDREN, &usage);
+        if(y)
+                perror("getrusage()");
+        else{
+                duration = 0;
+                duration = (float)usage.ru_utime.tv_usec;
+                duration /= (float)1000000.0;
+                duration += (float)usage.ru_utime.tv_sec;
+
+
+                printf("\nDuration: %0.4f\n",duration);
+                printf("\ntv_usec: %lu\n",usage.ru_utime.tv_usec);
+        }
 
         return 0;
 }
