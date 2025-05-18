@@ -5,15 +5,21 @@
 #include<unistd.h>
 #include<stdlib.h>
 #include<string.h>
+#include<fcntl.h>
 
 #include<assert.h>
 #include<errno.h>
+#include<sys/resource.h>
+#include<sys/time.h>
+#include<sys/wait.h>
 
 #define TagRoot 1/*0001*/
 #define TagNode 2/*0010*/
 #define TagLeaf 4/*0100*/
 
 #define NoError         0
+#define ExampleFile     "./wl.txt"
+#define ExampleFile2    "./wl.50k.txt"
 
 typedef void* Nullptr;
 Nullptr null_ptr = 0;
@@ -74,5 +80,9 @@ Node *find_node_linear(int8*);
 Node *create_node(Node*, int8*);
 Leaf *find_last_linear(Node*);
 Leaf *create_leaf(Node*, int8*, int8*, int16);
-
-int main(void);
+ int32 *example_searches(int8*);
+ Tree  *example_tree(void);
+ int32 *example_leaves(void);
+ int8  *example_path(int8);
+ int8  *example_duplicate(int8*);
+int main(int, char**);
