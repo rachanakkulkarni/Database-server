@@ -1,6 +1,7 @@
 /*cache22.c*/
-
 #include "cache22.h"
+
+extern Node root;
 
 int32 handle_hello(Client*, int8*, int8*);
 
@@ -38,19 +39,12 @@ int32 handle_hello(Client *cli, int8 *folder, int8 *args)
         return 0;
 }
 
-void zero(int8* buf,int16 size){
-        int8 *p;
-        int16 n;
-
-        for(n=0,p=buf; n<size; n++,p++)
-                *p = 0;
-}
-
 void childloop(Client *cli){
         int8 buf[256];
         int16 n;
         int8 *p, *f;
         int8 cmd[256], folder[256], args[256];
+        Callback cb;
 
         zero(buf,256);
         read(cli->s, (char *)buf, 255);
@@ -122,6 +116,17 @@ end:
         dprintf(cli->s, "\ncmd:\t%s\n",cmd);
         dprintf(cli->s, "\nfolder:\t%s\n",folder);
         dprintf(cli->s, "\nargs:\t%s\n",args);
+
+        cb = getcmd(cmd);
+        if(!cb){
+                dprintf(cli->s,"400 Command not found %s\n", cmd);
+                return;
+        }
+        else {
+                cb(cli, folder, args);
+                return;
+        }
+
         return;
 }
 
@@ -201,15 +206,36 @@ int main(int argc, char *argv[]){
         char *sport;
         int16 port;
         int s;
+        Node *n, *n2;
+        Leaf *l;
+        int8 *p;
+        int16 sz;
 
-        Callback x;
+        p = (int8 *)"true";
+        sz = (int16)strlen((char *)p);
 
-        x = getcmd((int8 *)"hello");
+        n = create_node(&root, (int8 *)"/Users/");
+        printf("n\t%p\n", n);
+
+        n2 = create_node(n, (int8 *)"/Users/jobj");
+        printf("n2\t%p\n", n2);
+
+        l = create_leaf(n, (int8 *)"loggedin",
+                        p,sz);
+        printf("l\t%p\n", l);
+
+        free(n2);
+        free(n);
+        exit(0);
+
+//      Callback x;
+
+/*      x = getcmd((int8 *)"hello");
         printf("%p\n",x);
 
         x = getcmd((int8 *)"skdkjdkjfn");
         printf("%p\n",x);
-
+*/
         if(argc <2)
                 sport = PORT;
         else
