@@ -9,6 +9,7 @@
 #include<assert.h>
 #include<errno.h>
 #include<stdbool.h>
+#include<Open.h>
 
 typedef unsigned int int32;
 typedef unsigned short int int16;
@@ -21,5 +22,7 @@ struct s_hash {
 };
 typedef struct s_hash Hash;
 
+void zero(int8*, int16);
 Hash hash_naive(int8*, int16);
 int main(int, char**);
+int16 Example_genhashes(int8 *, int8*);
